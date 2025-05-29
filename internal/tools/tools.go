@@ -614,6 +614,11 @@ func NewGetFeeTool() mcp.Tool {
 	return mcp.NewTool(
 		GetFeeToolID,
 		mcp.WithDescription("Get fee for a trading pair"),
+		mcp.WithString(
+			"pair",
+			mcp.Required(),
+			mcp.Description("Trading pair (e.g., XBTZAR)"),
+		),
 	)
 }
 

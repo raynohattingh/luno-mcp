@@ -94,6 +94,10 @@ func registerTools(server *mcpserver.MCPServer, cfg *config.Config) {
 	listTradesTool := tools.NewListTradesTool()
 	server.AddTool(listTradesTool, tools.HandleListTrades(cfg))
 
+	// Add fee tools
+	feeTools := tools.NewGetFeeTool()
+	server.AddTool(feeTools, tools.HandleGetFee(cfg))
+
 	// Add validation tools
 	validatePairTool := tools.NewValidatePairTool()
 	server.AddTool(validatePairTool, tools.HandleValidatePair(cfg))
