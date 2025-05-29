@@ -34,6 +34,7 @@ const (
 	ListTransactionsToolID = "list_transactions"
 	GetTransactionToolID   = "get_transaction"
 	ListTradesToolID       = "list_trades"
+	GetFeeToolID           = "get_fee"
 )
 
 // ===== Balance Tools =====
@@ -600,6 +601,47 @@ func HandleListTrades(cfg *config.Config) server.ToolHandlerFunc {
 		resultJSON, err := json.MarshalIndent(trades, "", "  ")
 		if err != nil {
 			return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal trades: %v", err)), nil
+		}
+
+		return mcp.NewToolResultText(string(resultJSON)), nil
+	}
+}
+
+// ===== Fee Tools =====
+
+// NewGetFeeTool creates a new tool for getting account balances
+func NewGetFeeTool() mcp.Tool {
+	return mcp.NewTool(
+		GetFeeToolID,
+		mcp.WithDescription("Get fee for a trading pair"),
+	)
+}
+
+// HandleGetFee handles the get_balances tool
+func HandleGetFee(cfg *config.Config) server.ToolHandlerFunc {
+	return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		// Since we're using a private API endpoint, authentication errors will be handled by the API call
+
+		pair, err := request.RequireString("pair")
+		if err != nil {
+			return mcp.NewToolResultErrorFromErr("getting pair from request", err), nil
+		}
+
+		// Normalize currency pair
+		pair = normalizeCurrencyPair(pair)
+
+		req := &luno.GetFeeInfoRequest{
+			Pair: pair,
+		}
+
+		fee, err := cfg.LunoClient.GetFeeInfo(ctx, req)
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Failed to get fee for pair %s: %v", pair, err)), nil
+		}
+
+		resultJSON, err := json.MarshalIndent(fee, "", "  ")
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal fee for pair %s: %v", pair, err)), nil
 		}
 
 		return mcp.NewToolResultText(string(resultJSON)), nil
