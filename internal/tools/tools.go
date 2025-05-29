@@ -609,7 +609,7 @@ func HandleListTrades(cfg *config.Config) server.ToolHandlerFunc {
 
 // ===== Fee Tools =====
 
-// NewGetFeeTool creates a new tool for getting account balances
+// NewGetFeeTool creates a new tool for getting fee information
 func NewGetFeeTool() mcp.Tool {
 	return mcp.NewTool(
 		GetFeeToolID,
